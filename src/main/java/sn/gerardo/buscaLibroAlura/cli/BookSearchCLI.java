@@ -11,6 +11,7 @@ import sn.gerardo.buscaLibroAlura.service.GutendexService;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 @Component
 public class BookSearchCLI implements CommandLineRunner {
@@ -42,6 +43,9 @@ public class BookSearchCLI implements CommandLineRunner {
                 case "3":
                     listSavedAuthors();
                     break;
+                case "4":
+                    listBooksByLanguage(scanner);
+                    break;
                 case "000":
                     System.out.println("Saliendo del programa...");
                     return;
@@ -56,6 +60,7 @@ public class BookSearchCLI implements CommandLineRunner {
         System.out.println("1. Buscar libros en Gutendex");
         System.out.println("2. Listar libros guardados");
         System.out.println("3. Listar autores guardados");
+        System.out.println("4. Listar libros por idioma");
         System.out.println("000. Salir");
         System.out.print("Seleccione una opción: ");
     }
@@ -146,5 +151,51 @@ public class BookSearchCLI implements CommandLineRunner {
         }
 
         System.out.printf("\nTotal de autores guardados: %d\n", savedAuthors.size());
+    }
+
+    private void listBooksByLanguage(Scanner scanner) {
+        // Get distinct languages
+        List<String> availableLanguages = bookRepository.findDistinctLanguages();
+
+        if (availableLanguages.isEmpty()) {
+            System.out.println("No hay libros guardados en la base de datos.");
+            return;
+        }
+
+        // Display available languages
+        System.out.println("\n--- Idiomas Disponibles ---");
+        for (int i = 0; i < availableLanguages.size(); i++) {
+            System.out.printf("%d. %s\n", i + 1, availableLanguages.get(i));
+        }
+
+        // Prompt for language selection
+        System.out.print("\nSeleccione un idioma (número): ");
+        try {
+            int languageChoice = Integer.parseInt(scanner.nextLine());
+
+            if (languageChoice < 1 || languageChoice > availableLanguages.size()) {
+                System.out.println("Selección inválida.");
+                return;
+            }
+
+            // Get selected language
+            String selectedLanguage = availableLanguages.get(languageChoice - 1);
+
+            // Find books in the selected language
+            List<Book> languageBooks = bookRepository.findByLanguagesContaining(selectedLanguage);
+
+            // Display books
+            System.out.printf("\n--- Libros en Idioma %s ---\n", selectedLanguage);
+            for (int i = 0; i < languageBooks.size(); i++) {
+                Book book = languageBooks.get(i);
+                System.out.printf("%d. Título: %s\n", i + 1, book.getTitle());
+                System.out.printf("   Autor: %s\n", book.getAuthor());
+                System.out.printf("   Descargas: %d\n\n", book.getDownloadCount());
+            }
+
+            System.out.printf("Total de libros en %s: %d\n", selectedLanguage, languageBooks.size());
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Por favor, ingrese un número.");
+        }
     }
 }

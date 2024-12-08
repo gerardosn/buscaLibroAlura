@@ -18,4 +18,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     // get distinct authors
     @Query("SELECT DISTINCT b.author FROM Book b ORDER BY b.author")
     List<String> findDistinctAuthors();
+
+    //  find books grouped by language
+    @Query("SELECT DISTINCT l FROM Book b JOIN b.languages l ORDER BY l")
+    List<String> findDistinctLanguages();
+    //  books with specific language
+    List<Book> findByLanguagesContaining(String language);
 }

@@ -14,6 +14,8 @@ public class Book {
     private String author;
 
     @ElementCollection
+    @CollectionTable(name = "book_languages", joinColumns = @JoinColumn(name = "book_id"))
+    @Column(name = "languages")
     private List<String> languages;
 
     private Integer downloadCount;
