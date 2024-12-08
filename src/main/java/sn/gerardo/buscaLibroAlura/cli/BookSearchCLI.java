@@ -38,12 +38,34 @@ public class BookSearchCLI implements CommandLineRunner {
                 System.out.print("¿Desea guardar los libros encontrados? (s/n): ");
                 String saveChoice = scanner.nextLine();
                 if ("s".equalsIgnoreCase(saveChoice)) {
-                    bookService.saveBooks(books);
-                    System.out.println("Libros guardados exitosamente.");
+                    saveAndDisplayResults(books);
                 }
             }
         }
         scanner.close();
+    }
+
+    private void saveAndDisplayResults(List<BookDTO> books) {
+        System.out.println("\n--- Resultados de Guardado ---");
+        int savedCount = 0;
+        int existingCount = 0;
+
+        List<BookService.SaveResult> saveResults = bookService.saveBooks(books);
+
+        for (BookService.SaveResult result : saveResults) {
+            System.out.println("Libro: " + result.book.title());
+            System.out.println("Estado: " + result.message);
+
+            if (result.saved) {
+                savedCount++;
+            } else {
+                existingCount++;
+            }
+            System.out.println("---");
+        }
+
+        System.out.printf("\nResumen: %d libros guardados, %d libros existentes\n",
+                savedCount, existingCount);
     }
 
     private void displayBooks(List<BookDTO> books) {
