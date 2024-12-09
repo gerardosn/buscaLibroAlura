@@ -46,6 +46,9 @@ public class BookSearchCLI implements CommandLineRunner {
                 case "4":
                     listBooksByLanguage(scanner);
                     break;
+                case "5":
+                    listAuthorsAliveInYear(scanner);
+                    break;
                 case "000":
                     System.out.println("Saliendo del programa...");
                     return;
@@ -61,6 +64,7 @@ public class BookSearchCLI implements CommandLineRunner {
         System.out.println("2. Listar libros guardados");
         System.out.println("3. Listar autores guardados");
         System.out.println("4. Listar libros por idioma");
+        System.out.println("5. Listar autores vivos para el año");
         System.out.println("000. Salir");
         System.out.print("Seleccione una opción: ");
     }
@@ -92,7 +96,8 @@ public class BookSearchCLI implements CommandLineRunner {
         System.out.println("\n--- Libros Guardados ---");
         for (int i = 0; i < savedBooks.size(); i++) {
             Book book = savedBooks.get(i);
-            System.out.printf("%d. %s\n", i + 1, book.getTitle());
+            System.out.printf("%d. Título: %s\n", i + 1, book.getTitle());
+            System.out.printf("   Autor: %s\n", book.getAuthor());
         }
 
         System.out.printf("\nTotal de libros guardados: %d\n", savedBooks.size());
@@ -189,13 +194,46 @@ public class BookSearchCLI implements CommandLineRunner {
             for (int i = 0; i < languageBooks.size(); i++) {
                 Book book = languageBooks.get(i);
                 System.out.printf("%d. Título: %s\n", i + 1, book.getTitle());
-                System.out.printf("   Autor: %s\n", book.getAuthor());
-                System.out.printf("   Descargas: %d\n\n", book.getDownloadCount());
+                System.out.printf("   Autor: %s\n\n", book.getAuthor());
+                //System.out.printf("   Descargas: %d\n\n", book.getDownloadCount());
             }
 
             System.out.printf("Total de libros en %s: %d\n", selectedLanguage, languageBooks.size());
         } catch (NumberFormatException e) {
             System.out.println("Entrada inválida. Por favor, ingrese un número.");
+        }
+    }
+
+    private void listAuthorsAliveInYear(Scanner scanner) {
+        System.out.print("Ingrese el año para buscar autores vivos: ");
+        try {
+            int year = Integer.parseInt(scanner.nextLine());
+
+            List<Book> savedBooks = bookRepository.findAll();
+
+            System.out.printf("\n--- Autores Vivos en %d ---\n", year);
+            savedBooks.stream()
+                    .filter(book ->
+                            book.getAuthorBirthYear() != null &&
+                                    book.getAuthorBirthYear() <= year &&
+                                    (book.getAuthorDeathYear() == null || book.getAuthorDeathYear() >= year)
+                    )
+                    .map(book -> {
+                        String authorInfo = book.getAuthor();
+                        if (book.getAuthorBirthYear() != null || book.getAuthorDeathYear() != null) {
+                            authorInfo += String.format(" (%s - %s)",
+                                    book.getAuthorBirthYear() != null ? book.getAuthorBirthYear() : "?",
+                                    book.getAuthorDeathYear() != null ? book.getAuthorDeathYear() : "?"
+                            );
+                        }
+                        return authorInfo;
+                    })
+                    .distinct()
+                    .forEach(System.out::println);
+
+            System.out.println("\nBúsqueda completada.");
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Por favor, ingrese un año válido.");
         }
     }
 }

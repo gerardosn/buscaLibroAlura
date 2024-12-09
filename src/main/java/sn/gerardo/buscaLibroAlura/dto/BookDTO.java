@@ -16,9 +16,17 @@ public record BookDTO(
                 ? authors.get(0).name()
                 : "Unknown Author";
     }
-}
+    // New method to get the first author's birth year
+    public Integer getFirstAuthorBirthYear() {
+        return authors != null && !authors.isEmpty()
+                ? authors.get(0).birthYear()
+                : null;
+    }
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-record AuthorDTO(
-        @JsonAlias("name") String name
-) {}
+    // New method to get the first author's death year
+    public Integer getFirstAuthorDeathYear() {
+        return authors != null && !authors.isEmpty()
+                ? authors.get(0).deathYear()
+                : null;
+    }
+}

@@ -12,15 +12,34 @@ public class Book {
 
     private String title;
     private String author;
+    //nacimiento y muerte del autor
+    private Integer authorBirthYear;
+    private Integer authorDeathYear;
 
     @ElementCollection
     @CollectionTable(name = "book_languages", joinColumns = @JoinColumn(name = "book_id"))
     @Column(name = "languages")
     private List<String> languages;
-
     private Integer downloadCount;
 
     // ... getters and setters
+
+
+    public Integer getAuthorBirthYear() {
+        return authorBirthYear;
+    }
+
+    public void setAuthorBirthYear(Integer authorBirthYear) {
+        this.authorBirthYear = authorBirthYear;
+    }
+
+    public Integer getAuthorDeathYear() {
+        return authorDeathYear;
+    }
+
+    public void setAuthorDeathYear(Integer authorDeathYear) {
+        this.authorDeathYear = authorDeathYear;
+    }
 
     public Long getId() {
         return id;

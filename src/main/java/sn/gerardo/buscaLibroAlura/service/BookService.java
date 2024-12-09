@@ -50,6 +50,9 @@ public class BookService {
         book.setAuthor(dto.getAuthorNames());
         book.setLanguages(dto.languages());
         book.setDownloadCount(dto.downloadCount());
+        // Set author birth and death years from the first author in the list
+        book.setAuthorBirthYear(dto.getFirstAuthorBirthYear());
+        book.setAuthorDeathYear(dto.getFirstAuthorDeathYear());
         return book;
     }
 
